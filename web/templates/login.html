@@ -1,0 +1,60 @@
+{% extends "skeleton.html" %}
+{% block title %}Recipe List{% endblock %}
+
+{% block head %}
+   {{ super() }}
+   <style type="text/css">
+      .important { color: #336699; }
+   </style>
+{% endblock head %}
+
+{% block content %}
+	<main>	 
+		<div class='row'>
+			<div class="container col-md-12">
+				<form class="form-signin" action='/login' method='post'>
+					<h2 class="form-signin-heading">Please sign in</h2>
+					{% with messages = get_flashed_messages(with_categories=true) %}
+						{% if messages %}
+							<ul class=flashes>
+								{% for category, message in messages %}
+									<li class='alert {{category}}'>{{ message }} </li>
+								{% endfor %}
+							</ul>
+						{% endif %}
+					{% endwith %}
+					<label for="inputEmail" class="sr-only">Username or Email address</label>
+					<input type="username" name='username' id="username-input" class="form-control" placeholder="Username or Email address" required autofocus>
+					<label for="inputPassword" class="sr-only">Password</label>
+					<input type="password" name='password' id="password-input" class="form-control" placeholder="Password" required>
+					<div class="checkbox">
+						<label>
+							<input id='remember-me' name='rememberme' type="checkbox"> Remember me</input>
+						</label>
+					</div>
+					<button class="btn btn-lg btn-primary btn-block">Sign in</button>
+				</form>
+			</div>
+		</div>
+		
+		<div class='row'>
+			<div class="container col-md-12">
+				<h3>Or</h3>
+			</div>
+		</div>
+
+		<div class='row'>
+			<div class="container col-md-12">
+				<form class="form-signin" action='/register' method='post'>
+					<h2 class="form-signin-heading">Register</h2>
+					<label for="inputEmail" class="sr-only">Username or Email address</label>
+					<input type="username" name='username' id="username-input" class="form-control" placeholder="Username or Email address" required>
+					<label for="inputPassword" class="sr-only">Password</label>
+					<input type="password" name='password' id="password-input" class="form-control" placeholder="Password" required>
+					<button class="btn btn-lg btn-primary btn-block">Register</button>
+				</form>
+			</div>
+		</div>		
+	</main>
+
+{% endblock %}

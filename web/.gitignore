@@ -1,0 +1,8 @@
+*.log
+*.py[cod]
+
+workspace
+
+__pycache__/
+kubernetes/
+flask_session/

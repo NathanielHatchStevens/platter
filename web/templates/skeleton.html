@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   {% block head %}
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+		<style>
+			body    { padding-top:50px; }
+			.btn-link{
+				padding-top:14px;
+			}
+			
+			.jumbotron {
+				background-color:rgba(1, 1, 1, 0.8);
+				color: white;
+			}
+			
+			.flasher.error {
+				background: red;
+			}
+			
+		</style>
+		<script src='/static/public/js/jquery-3.2.1.js'></script>
+		
+		<title>{% block title %}{% endblock %} - Recipe Saver - {{session.username}}</title>
+   {% endblock %}
+</head>
+<body>
+		<div class='container'>
+			{% block header %}
+				<script type="text/javascript">
+					$(document).ready(function(){
+						//alert('ready');
+					});
+				</script>
+
+				<nav class="navbar navbar-default" role="navigation">
+					 <div class="container-fluid">
+
+						  <div class="navbar-header">
+								<a class="navbar-brand" href="/">
+									 <span class="glyphicon glyphicon glyphicon-tree-deciduous"></span>
+									 Recipe Saver
+								</a>
+						  </div>
+
+						  <ul class="nav navbar-nav">
+								<li><a href="/">Home</a></li>
+								<li><a href="/recipe_book">Recipes</a></li>
+								<li><a href="/about">About</a></li>
+								{% if session.username %}
+									<li id='logout'>
+										<form action='/logout' method='POST'>
+											<button type='submit' name='logout' value='logout' class='btn btn-link'>
+												Log Out
+											</button>
+										</form>
+									</li>
+									<li>
+											<a>{{session.username}}</a>
+									</li>
+								{% else %}
+									<li id='login'><a href="/login">Login</a></li>
+								{% endif %}
+									
+						  </ul>
+						
+					 </div>
+				</nav>
+			{% endblock header %}
+			<div id="content">
+				<div class='row'>
+					<div class='col-md-12'>
+						{% block content %}
+							<p>Default content</p>
+						{% endblock %}
+					</div>
+				</div>
+			</div>
+			<br>
+			<div id="footer">
+				{% block footer %}
+				<p class="text-center text-muted">© Copyright CurrentYear The Awesome People</p>
+				{% endblock %}
+			</div>
+		</div>
+</body>
+</html>

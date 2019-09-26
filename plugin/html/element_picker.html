@@ -1,0 +1,49 @@
+<div id='platter-epicker' style="position: fixed;
+											bottom: 10px;
+											right: 0;
+											width: 40%;
+											height: 350px;
+											
+											background-color: #eee;
+											padding: 5px;
+											border: 3px solid #bbb;
+											">
+	<div id='header'>
+		<p>Platter Picker</p>
+	</div>
+	<div>
+		<span>Recipe Title: </span>
+		<b>
+			<span id='recipe-title'></span>
+		</b>
+		<span><a href='#' id='start-picking-title'>Pick</a></span>
+	</div>
+	<div>
+		<div>
+			<p>
+				Ingredients: 
+				<a href='#' id='start-picking-ingredients'>Pick</a>
+				<a href='#' id='pick-ingredients-subheading' class='pick-subheading'>Subheading</a>
+			</p>
+		</div>
+		<div style='overflow-y:scroll; height:80px; background-color: #fff; border: 1px solid #ccc;'>
+			<ul id='ingredients'>
+			</ul>
+		</div>
+	</div>
+	<div>
+		<div>
+			<p>Method: 
+			<a href='#' id='start-picking-method'>Pick</a>
+			<a href='#' id='pick-method-subheading' class='pick-subheading'>Subheading</a>
+		</p>
+		</div>
+		<div style='overflow-y:scroll; height:80px; background-color: #fff; border: 1px solid #ccc;'>
+			<ul id='method'>
+			</ul>
+		</div>
+	</div>	
+	<div>
+		<p><a href='#' id='submit-recipe'>Submit Recipe</a></p>
+	</div>
+</div>

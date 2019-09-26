@@ -1,0 +1,101 @@
+{% extends "skeleton.html" %}
+{% block title %}Welcome{% endblock %}
+{% block head %}
+    {{ super() }}
+    <style type="text/css">
+		.important { color: #336699; }
+		.main-column-img{
+			width: 100%;
+			border-radius: 20px;
+		}
+		.panel {
+			border-radius: 20px;
+		}
+		.panel-heading {
+			border-top-left-radius: 20px;
+			border-top-right-radius: 20px;
+		}
+		.top-buffer { margin-top:20px; }
+    </style>
+{% endblock %}
+{% block content %}
+   <main>
+		<div class='row'>
+			<div class="jumbotron">
+				<h1>This is great</h1>
+				<p>Save your recipes. Like Pinterest but incredibly miopic.</p>
+			</div>
+		</div>
+		
+		<div class='row top-buffer'>
+			<div class='col-md-6'>
+				<img class='main-column-img' src='static/public/img/bbq-small.jpg'>
+			</div>
+			<div class='col-md-6 main-column-panel'>
+				<div class='panel panel-success'>
+					<div class='panel-heading'>How does it work?</div>
+					<div class='panel-body'>
+						<p>
+							<ol>
+								<li>Find the recipe you like.</li>
+								<li>Copy the link into our saving machine.</li>
+								<li>Done. Have some cake, champ.</li>
+							</ol>
+						</p>
+						<p>
+							Go on... <a href='/add_new_recipe'>Give it a go!</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class='row top-buffer'>
+			<div class='col-md-6 main-column-panel'>
+				<div class='panel panel-info'>
+					<div class='panel-heading'>But why?</div>
+					<div class='panel-body'>
+						<p>Anything posted to the internet is inherently ephemeral. You can bookmark something you like, but there's no guarantee it will be preserved.</p>
+						<p>Whether the recipe is deleted to make way for a new one, or the recipe is changed without a mention, it's frustrating to lose a recipe you love.</p>
+						<p>So that's why we made this website, so you never have to again.</p>
+					</div>
+				</div>
+			</div>
+			<div class='col-md-6'>
+				<img class='main-column-img' src='static/public/img/pizza-small.jpg'>
+			</div>
+		</div>
+		
+		<div class='row top-buffer'>
+			<div class='col-md-6'>
+				<img class='main-column-img' src='static/public/img/salad-small.jpg'>
+			</div>
+			<div class='col-md-6 main-column-panel'>
+				<div class='panel panel-warning'>
+					<div class='panel-heading'>Is it legal?</div>
+					<div class='panel-body'>
+						<p>Maybe?</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class='row top-buffer'>
+			<div class='col-md-6 main-column-panel'>
+				<div class='panel panel-info'>
+					<div class='panel-heading'>Where can I save from?</div>
+					<div class='panel-body'>
+						<p>Our list of supported websites is growing daily, but for now you can check the full list on our <a href='/about'>About</a> page.</p>
+						<p>We currently support 2/15 of the most popular recipe websites</p>
+						<p>If there's a specific site that isn't supported, just send us an email with the page you were looking at and we'll bump it to the top of the list.</p>
+					</div>
+				</div>
+			</div>
+			<div class='col-md-6'>
+				<img class='main-column-img' src='static/public/img/burger-small.jpg'>
+			</div>
+		</div>
+		
+    </main>
+
+{% endblock %}

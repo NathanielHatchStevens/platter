@@ -1,0 +1,36 @@
+{% extends "skeleton.html" %}
+{% block title %}{{data.recipe.title}}{% endblock %}
+{% block head %}
+   {{ super() }}
+   <style type="text/css">
+      .important { color: #336699; }
+   </style>
+	<link rel="stylesheet" href="/static/public/js/bootstrap-tagsinput-latest/dist/bootstrap-tagsinput.css">
+{% endblock %}
+{% block content %}
+   <main>
+		<div class='row'>
+			<h1>{{ data.recipe.title }}</h1>
+		</div>
+		<div class='row'>
+			<div class='col-md-8'>
+				<div id='heading' class="">
+					<p>Original URL: <a href='{{data.recipe.url}}' target='_blank'>{{data.recipe.url}}</a></p>
+				</div>
+				<div id='main_block'>
+					{% filter markdown %}
+					{{data.recipe.body}}
+					{% endfilter %}
+				</div>
+			</div>
+			<div class='col-md-4'>
+				<p>
+					<h2>Options</h2>
+					<a href='/edit_recipe/{{data.recipe.id}}'>Edit</a>
+					<a id='delete-recipe' href='/delete_recipe/{{data.recipe.id}}'>Delete</a></p>
+				</p>
+			</div>
+		</div>
+   </main>
+
+{% endblock %}

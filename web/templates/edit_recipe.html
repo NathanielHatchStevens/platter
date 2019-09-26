@@ -1,0 +1,98 @@
+{% extends "skeleton.html" %}
+{% block title %}{{data.name}}{% endblock %}
+{% block head %}
+   {{ super() }}
+   <style type="text/css">
+      .important { color: #336699; }
+   </style>
+{% endblock %}
+{% block content %}
+   <main>
+      <div id='heading' class="row">
+         <h1>Edit Recipe</h1>
+      </div>
+		<form action='/edit_recipe/{{data.recipe._id}}' method='POST'>
+		
+			<div class='row'>
+				<div class='col-md-12'>
+					<div id='heading'>
+						<label for='title'>Title</lable>
+						<input type='text' id='title' name='title' class='form-control' value='{{data.recipe.title}}'>
+					</div>
+				</div>
+			</div>
+			<br>
+			
+			<div class='row'>
+				<div class='col-md-6'>
+					<div class="form-group">
+						<label for="recipe_text">Recipe</label>
+						<textarea class="form-control" name='body' id='body' rows="25">{{data.recipe.body}}</textarea>
+					</div>
+				</div>	
+			<br />
+				<div class='row'>
+					<button type="submit" class="btn btn-primary">Submit</button>
+					or
+					<a href='/recipe/{{data.recipe._id}}' class="btn btn-warning">Cancel</a>
+				</div>
+			<br />
+				<div class='col-md-6'>
+					<h2>Markup Cheat Sheet</h2>
+					<table class='table'>
+						<tr>
+							<th>Input</th>
+							<th>Result</th>
+						</tr>
+						<tr>
+							<td> ## Big Heading</td>
+							<td> <h2>Big Heading</h2> </td>
+							
+						</tr>
+						<tr>
+							<td> ### Medium Heading</td>
+							<td> <h3>Medium Heading</h3> </td>
+							
+						</tr>
+						<tr>
+							<td> #### Small Heading</td>
+							<td> <h4>Small Heading</h4> </td>
+							
+						</tr>
+						<tr>
+							<td> **Bold**</td>
+							<td><strong>Bold</strong></td>
+						</tr>
+						<tr>
+							<td> *Italic*</td>
+							<td><em>Italic</em></td>
+						</tr>
+						<tr>
+							<td>  *Item 1<br>  *Item 2<br>  *Item 3</td>
+							<td>
+								<ul>
+									<li> Item 1 </li>
+									<li> Item 2 </li>
+									<li> Item 3 </li>
+								</ul>
+							</td>
+							
+						</tr>
+						<tr>
+							<td> 1. Item 1<br>2. Item 2<br>3. Item 3</td>
+							<td>
+								<ol>
+									<li> Item 1 </li>
+									<li> Item 2 </li>
+									<li> Item 3 </li>
+								</ol>
+							</td>
+						</tr>
+						
+					</table>
+				</div>
+			</div>
+		</form>
+   </main>
+
+{% endblock %}

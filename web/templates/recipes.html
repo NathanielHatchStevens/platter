@@ -1,0 +1,45 @@
+{% extends "skeleton.html" %}
+{% block title %}Recipes{% endblock %}
+{% block head %}
+   {{ super() }}
+   <style type="text/css">
+      .important { color: #336699; }
+   </style>
+{% endblock %}
+{% block content %}
+   <main>
+      <div id='heading' class="row">
+         <h1>Recipes</h1>
+      </div>
+		<div class='row'>
+			<div class='col-md-3'>
+				<ul>
+					<li><a href='/add_new_recipe'>Add a new recipe.</a></li>
+					<li><a href='/create_new_recipe'>Create a new recipe</a></li>
+					<li><a href='/download_all_recipes'>Download all my saved recipes</a></li>
+				</ul>
+			</div>
+			<div class='col-md-9'>
+				<div id='recipe-list'>
+					<h2> Saved {{data.current_tag}} Recipes </h2>
+					<ul>
+						{% if data.recipes|length == 0 %}
+							<p> You don't have any recipes saved. :( </p>
+						{% endif %}
+						{% for recipe in data.recipes %}
+							<li><a href='/recipe/{{recipe.id}}'>
+								{% if recipe.name|length == 0 %}
+									Unnamed
+								{% else %}
+									{{recipe.name}}
+								{% endif %}
+							</a>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+			
+		</div>
+   </main>
+
+{% endblock %}
