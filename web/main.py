@@ -20,7 +20,7 @@ import routes
 app = Flask(__name__, static_url_path='')
 # app.config.
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/recipes'
-app.secret_key = 'DO NOT CHANGE ME; I AM A PERFECTLY ADEQUATE SECRET KEY. LOOK HOW WONDERFULLY LONG I AM. YOU SHOULD HAVE STOPPED READING AT COL 80; PENIS JOKE'
+app.secret_key = 'DO NOT CHANGE ME; I AM A PERFECTLY ADEQUATE SECRET KEY. LOOK HOW WONDERFULLY LONG I AM. I DON\'T REALLY KNOW HOW THIS WORKS'
 app.config['SESSION_TYPE'] = 'filesystem'
 mongo = PyMongo(app)
 Session(app)
