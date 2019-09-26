@@ -1,3 +1,4 @@
+// This code iesn't mine but I don't remember where I borrowed it from. If it's yours and you want it back, please send me a message
 
 function elementPickerFactory() {
 
@@ -86,7 +87,6 @@ function elementPickerFactory() {
 };
 
 function onClick(element){
-	// var ul = document.querySelector('ul')//#ingredient-list');
 	console.log(element.innerText)
 	browser.runtime.sendMessage(element.innerText)
 	
