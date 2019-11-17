@@ -5,9 +5,9 @@
   "version": "1.0",
 
   "description": "Pick Elements to save them to your recipe",
-  "homepage_url": "",
+  "homepage_url": "https://www.google.com",
   "icons": {
-    "48": "icons/beasts-48.png"
+    "48": "icons/icon-48.png"
   },
 
   "permissions": [
@@ -22,7 +22,7 @@
   },
   
   "background": {
-		"scripts": ["./background_scripts/background.js"]
+		"scripts": ["background_scripts/background.js"]
 	},
 	
   "web_accessible_resources": [

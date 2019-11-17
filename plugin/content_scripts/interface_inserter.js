@@ -41,9 +41,7 @@ function StopPicking(id){
 												StartPicking(myvar);
 											}
 										})(id);
-	
-	console.log('stopped picking')
-	
+		
 	document.getElementById('pick-'+id+'-subheading').style.visibility = 'hidden';
 	
 	picking = false
@@ -173,7 +171,6 @@ function elementPickerFactory() {
   }
 
   function onMouseClick(event) {
-
     event      = event || window.event;
     var target = event.target || event.srcElement;
     if (event.preventDefault) event.preventDefault();
@@ -201,7 +198,6 @@ function elementPickerFactory() {
   }
 
   function init(options) {
-
     if (!options || !options.onClick) {
       console.error('onClick option needs to be specified.');
       return;
@@ -232,7 +228,7 @@ function elementPickerFactory() {
 };
 
 function onClick(element){
-	var picker_div = document.getElementById('plater-epicker');
+	var picker_div = document.getElementById('platter-epicker');
 	if(picker_div == element || picker_div.contains(element) == true){
 		return;// ignore ourselves
 	}
@@ -240,9 +236,11 @@ function onClick(element){
 	var text = element.innerText;
 	if(picking_id == 'title'){
 		SetTitle(text);
+		StopPicking(picking_id)
 	}
 	else{
 		AddToList(text);
+		
 	}
 }
 
@@ -270,7 +268,6 @@ function SetTitle(text){
 }
 
 function AddToList(text){
-	
 	for(let line of text.split('\n')){
 		var list = document.querySelector('ul#'+picking_id);
 		var new_li = document.createElement('li');
