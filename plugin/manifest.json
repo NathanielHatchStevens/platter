@@ -26,6 +26,9 @@
 	},
 	
   "web_accessible_resources": [
+	 "html/js/login_prompt.js",
+	 "html/js/element_picker.js",
+	 "html/js/utils.js",
     "html/element_picker.html",
 	 "css/element_picker.css"
   ]

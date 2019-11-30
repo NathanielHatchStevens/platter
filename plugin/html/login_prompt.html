@@ -1,0 +1,38 @@
+<body id='platter-login-body'>
+	<div id='platter-login' style="position: fixed;
+												bottom: 10px;
+												right: 0;
+												width: 40%;
+												height: 350px;
+												
+												background-color: #eee;
+												padding: 5px;
+												border: 3px solid #bbb;
+												">
+		<div id='header'>
+			<p>Platter Picker Login</p>
+		</div>
+
+			<div class='row'>
+				<div class="container col-md-12">
+					<form class="form-signin" action='/login' method='post'>
+					
+						<div class="container col-sm">
+							<label for="inputEmail" class="sr-only">Username or Email address</label>
+							<input type="username" name='username' id="platter-login-username" class="form-control" placeholder="Username or Email address" required autofocus>
+						</div>
+						<div class="container col-sm">
+							<label for="inputPassword" class="sr-only">Password</label>
+							<input type="password" name='password' id="platter-login-password" class="form-control" placeholder="Password" required>
+						</div>	
+						<div class="container col-sm">
+							<a href="#" id="platter-webext-login">Login</a>
+							<a href="#" id="platter-webext-register">Register</a>
+							<a href="#" id="platter-webext-cancel">Cancel</a>
+						</div>
+					</form>
+				</div>
+			</div>		
+	</div>
+	<script src='/js/login_prompt.js'></script>
+</body>

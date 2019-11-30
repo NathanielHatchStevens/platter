@@ -1,15 +1,20 @@
-<div id='platter-epicker' style="position: fixed;
+<div id='picker-overlay-main' style="position: fixed;
 											bottom: 10px;
 											right: 0;
 											width: 40%;
-											height: 350px;
+											height: 450px;
 											
 											background-color: #eee;
 											padding: 5px;
 											border: 3px solid #bbb;
 											">
 	<div id='header'>
-		<p>Platter Picker</p>
+		<p id='platter-header'>Platter Picker</p>
+		<p id='platter-login-element'><a href='#' id='submit-login'>login</a></p>
+		<p id='platter-username-logout-element'>
+			<span id='platter-username'></span>
+			<a href='#' id='submit-logout'>Log Out</a>
+		</p>		
 	</div>
 	<div>
 		<span>Recipe Title: </span>
