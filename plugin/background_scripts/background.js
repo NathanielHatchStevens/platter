@@ -1,34 +1,56 @@
 var login_token
-var ports = {}
+// var ports = {}
 var funcs
 var first_port = true
 var picker_open = false
 
+var picker = false
+var login = false
+
 function log(msg){
-	ports[first_port].postMessage({greeting: '[BackgroundScript]: '+msg})
+	picker.postMessage({greeting: '[BackgroundScript]: '+msg})
 }
 
 function error(e){
-	ports[first_port].postMessage({greeting: '[BackgroundScript ERROR]: '+e})
+	picker.postMessage({greeting: '[BackgroundScript ERROR]: '+e})
 }
 
 function OnMessage(msg, sender, sendResponse){
-	// log('Message Redcieved: '+msg.greeting)
+	try{
+	if(msg.relay){
+		target = msg.relay_target
+		delete msg.relay
+		delete msg.relay_target
+		
+		if(target == 'picker'){
+			picker.postMessage(msg)
+		}
+		else{
+			log('Unknown relay target: '+target)
+		}
+	}
 	if(msg.show_login_prompt){
 		browser.tabs.executeScript({file: "/content_scripts/login_prompt.js"});
-	}		
+	}
+	}catch(e){log(e)}
 }
 
 function AcceptConnection(p){
 	let id = p.name
-	if(first_port){
-		first_port = id;
-	}
 	
-	ports[id] = p;
-	ports[id].onMessage.addListener(OnMessage);
-	log('connection accepted')
-};
+	if(id == 'picker'){
+		picker = p;
+	}
+	else if(id == 'login'){
+		login = p;
+	}
+	else{
+		log('Unknown connection origin: '+id)
+		return
+	}
+	p.onMessage.addListener(OnMessage);
+	log('Connection Accepted: '+id)
+}
 
 
 function LoadPickerOverlay(tab){
@@ -37,26 +59,25 @@ function LoadPickerOverlay(tab){
 		browser.tabs.executeScript({file: "/content_scripts/picker_overlay.js"})
 		browser.tabs.executeScript({file: "/content_scripts/element_picker_factory.js"})
 		picker_open = true
+		
+		// browser.storage.local.get('token').then(function(data){
+			// picker.postMessage({greeting: 'Stored Login', data: data})
+		// });
 	}
 	else{
-		ports['picker'].postMessage({greeting: 'Close', close: true})
-		picker_opne = false
+		picker.postMessage({greeting: 'Close', close: true})
+		picker_open = false
+		// alert()
 	}
 };
 
+// Depreciated
 function HandleMessage(req, sender, sendResponse){
-	if(req.show_login_prompt){
-		browser.tabs.executeScript({file: "/content_scripts/login_prompt.js"})
-		sendResponse({response: 'Loaded login_prompt.js'})
-	}
 	if(req.login_successful){
-		try{
 		login_token = res.token
 		for(let tab of tabs){
-			
 			browser.tabs.sendMessage(tab.id, {login_successful: true})
 		}
-		}catch(e){alert(e)}
 	}
 }
 

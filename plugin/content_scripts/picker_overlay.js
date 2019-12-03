@@ -9,7 +9,8 @@ function PickerOverlayFactory(){
 
 	var element_picker = elementPickerFactory();
 
-	var port
+	var port;
+	var token = false;
 
 	function StartPicking(id){
 		if(picking == true){
@@ -27,7 +28,7 @@ function PickerOverlayFactory(){
 													StopPicking(myvar);
 												}
 											})(id);	
-		document.getElementById('pick-'+id+'-subheading').style.visibility = 'visible';
+		document.getElementById('pick-'+id+'-subheading').style.display = 'block';
 		picking = true;	
 		return false; // stops browser follow dud link
 	}
@@ -44,20 +45,37 @@ function PickerOverlayFactory(){
 												}
 											})(id);
 			
-		document.getElementById('pick-'+id+'-subheading').style.visibility = 'hidden';
+		document.getElementById('pick-'+id+'-subheading').style.display = 'none';
 		picking = false	
 		return false
+	}
+	
+	function ToggleLoggedIn(logged_in, login_info){
+		if(logged_in){
+			document.getElementById('platter-username').innerHTML = login_info.username
+			document.getElementById('platter-login-element').style.display = 'none';
+			document.getElementById('platter-username-logout-element').style.display = 'block';
+			token = login_info.token
+		}
+		else{
+			document.getElementById('platter-login-element').style.display = 'block';
+			document.getElementById('platter-username-logout-element').style.display = 'none';
+			token = false;
+		}
 	}
 
 	function OnMessage(msg){
 		console.log(msg.greeting);
 		if(msg.close){
-			console.log('closing')
 			picker_dom = document.getElementById('picker-overlay-main')
-			console.log(picker_dom)
 			picker_dom.parentNode.removeChild(picker_dom)
 		}
+		
+		if(msg.login_successful){
+			ToggleLoggedIn(true, msg)
+		}
 	}
+	
 
 	function ConnectToBackgroundScript(){
 		port = browser.runtime.connect({name: 'picker'})
@@ -66,6 +84,11 @@ function PickerOverlayFactory(){
 
 	function ShowLoginPrompt(){
 		port.postMessage({greeting: 'Show the login prompt', show_login_prompt: true});
+	}
+	
+	function LogOut(){
+		browser.storage.local.remove('login_info');
+		ToggleLoggedIn(false)
 	}
 
 	function InitControls(){
@@ -88,18 +111,30 @@ function PickerOverlayFactory(){
 																							})('method');
 																							
 		document.getElementById('submit-recipe').onclick = SubmitRecipe;
-		document.getElementById('submit-login').onclick = ShowLoginPrompt;
-		// document.getElementById('submit-login').onclick = ShowLoginPrompt;
+		document.getElementById('platter-show-login').onclick = ShowLoginPrompt;
+		document.getElementById('platter-submit-logout').onclick = LogOut;
 		
+				
 		for(let el of document.getElementsByClassName('pick-subheading')){
-			el.style.visibility = 'hidden';
+			el.style.display = 'none';
 			el.onclick = function(){ picking_subheading = true; };
 			picking_subheading = false;
 		}
+		
+		browser.storage.local.get('login_info')
+		.then(
+			function(data){
+				if(data.login_info){
+					ToggleLoggedIn(true, data.login_info)
+				}
+				else{
+					ToggleLoggedIn(false)
+				}
+			}
+		)
 	}
-
+	
 	function LoadHTML(){
-		// var picker_interface_url = browser.runtime.getURL("html/login_prompt.html");
 		var picker_interface_url = browser.runtime.getURL("html/element_picker.html");
 		var request = new XMLHttpRequest();
 		request.open('GET', picker_interface_url, true)
@@ -111,7 +146,6 @@ function PickerOverlayFactory(){
 				frag.innerHTML = resp;
 				document.querySelector('body').appendChild(frag);	
 				InitControls();
-				console.log('overlay loading')
 				ConnectToBackgroundScript();
 			}
 		};
@@ -129,7 +163,7 @@ function PickerOverlayFactory(){
 		post_url ='http://localhost:8000/submit_recipe'
 
 		var recipe = {};
-		recipe['owner'] = '5d5b84d4eab1510c48626ed9';
+		recipe['token'] = token;
 		recipe['url'] = document.URL;
 		recipe['title'] = document.getElementById('recipe-title').innerText;
 		
@@ -144,7 +178,7 @@ function PickerOverlayFactory(){
 			}
 		}
 		
-		PostData('', recipe)
+		PostData(post_url, recipe)
 		.then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
 		.catch(error => console.error(error));
 	}
@@ -238,7 +272,6 @@ function PickerOverlayFactory(){
 	picker.run = run;
 	return picker
 }
-
 picker = PickerOverlayFactory()
 
 picker.run()

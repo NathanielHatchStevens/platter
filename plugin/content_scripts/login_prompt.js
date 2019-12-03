@@ -1,8 +1,9 @@
 function LoginPromptFactory(){
 	var port
+	var username
 	
 	function ConnectToBackgroundScript(){
-		port = browser.runtime.connect({name: 'picker'})
+		port = browser.runtime.connect({name: 'login'})
 		port.onMessage.addListener(OnMessage);	
 	}
 
@@ -11,10 +12,10 @@ function LoginPromptFactory(){
 	}		
 		
 	function GetSubmissionData(){
-		var username = document.getElementById('platter-username').value
-		var password = document.getElementById('platter-password').value
-		
-		return {'username': username, 'password': password}
+		return {
+					'username': document.getElementById('platter-login-username-input').value, 
+					'password': document.getElementById('platter-login-password-input').value
+				  }
 	}
 
 	function PrecheckSubmissionData(data){
@@ -27,6 +28,7 @@ function LoginPromptFactory(){
 			console.log('Precheck failed')
 			return false;
 		}
+		username = data.username;
 		
 		var xhr = new XMLHttpRequest()
 		data = JSON.stringify(data)
@@ -39,17 +41,23 @@ function LoginPromptFactory(){
 				let submit_response = JSON.parse(xhr.responseText)
 				if(submit_response.success){
 					document.getElementById('platter-login-body').remove()
-					browser.runtime.sendMessage({
-						login_successful: true,
-						hide_login_prompt: true,
-						login_token: submit_response.token
-					})
+					console.log(username)
+					browser.storage.local.set({login_info: {username: username, token: submit_response.token}})
+					let msg = {greeting: 'Login Successful', 
+ 								  relay: true,
+								  relay_target: 'picker',
+								  login_successful: true, 
+								  username: username,
+								  token: submit_response.token}
+					port.postMessage(msg)
+				}
+				else{
+					console.log('failed')
 				}
 					
 			}
 		};
 		xhr.send(data)
-		
 	}
 
 	function SubmitRegistration(){
@@ -58,7 +66,6 @@ function LoginPromptFactory(){
 	
 	function CancelLogin(){
 		var login_prompt = document.getElementById('platter-login-body')
-		console.log(login_prompt)
 		login_prompt.parentNode.removeChild(login_prompt);
 	}
 
@@ -70,11 +77,11 @@ function LoginPromptFactory(){
 		
 		browser.runtime.onMessage.addListener(
 			function(req, sender, senderResponse){
-				console.log('Message recieved')
-				console.log(req)
-				if(req.login_successful){
-					console.log('logindetected successful login')
-				}
+				console.log('Message recieved'+req)
+				// console.log(req)
+				// if(req.login_successful){
+					// console.log('logindetected successful login')
+				// }
 			}
 		);
 	}
