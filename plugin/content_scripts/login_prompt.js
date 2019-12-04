@@ -70,6 +70,7 @@ function LoginPromptFactory(){
 	}
 
 	function InitControls(){
+		console.log('Is the picker accesssable: '+picker.yes)
 		
 		document.getElementById('platter-webext-login').onclick = SubmitLogin;
 		// document.getElementById('platter-webext-register').onclick = SubmitRegistration;

@@ -260,16 +260,10 @@ function PickerOverlayFactory(){
 
 	function run(){
 		LoadHTML();
-		if(window.interface_open){
-			CloseInterface();
-			window.interface_open = false;
-		}
-		else{
-			window.interface_open = true;
-		}
 	}
 	
 	picker.run = run;
+	picker.yes = true;
 	return picker
 }
 picker = PickerOverlayFactory()

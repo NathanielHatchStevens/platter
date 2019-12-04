@@ -1,14 +1,18 @@
 var login_token
-// var ports = {}
-var funcs
-var first_port = true
+
+
 var picker_open = false
 
 var picker = false
 var login = false
+var logger = false
+
+var tabs = {}
+
+var bgid = -1
 
 function log(msg){
-	picker.postMessage({greeting: '[BackgroundScript]: '+msg})
+	picker.postMessage({greeting: '[BackgroundScript('+bgid+']: '+msg})
 }
 
 function error(e){
@@ -16,7 +20,6 @@ function error(e){
 }
 
 function OnMessage(msg, sender, sendResponse){
-	try{
 	if(msg.relay){
 		target = msg.relay_target
 		delete msg.relay
@@ -32,7 +35,6 @@ function OnMessage(msg, sender, sendResponse){
 	if(msg.show_login_prompt){
 		browser.tabs.executeScript({file: "/content_scripts/login_prompt.js"});
 	}
-	}catch(e){log(e)}
 }
 
 function AcceptConnection(p){
@@ -44,6 +46,9 @@ function AcceptConnection(p){
 	else if(id == 'login'){
 		login = p;
 	}
+	else if(id == 'logger'){
+		logger = p;
+	}
 	else{
 		log('Unknown connection origin: '+id)
 		return
@@ -54,33 +59,29 @@ function AcceptConnection(p){
 
 
 function LoadPickerOverlay(tab){
-	if(picker_open == false){
+	if(tab.id in tabs){
+		log('Tab has overlay already')
+		picker.postMessage({greeting: 'close', close: true});
+		delete tabs[tab.id];
+	}
+	else{
 		browser.tabs.executeScript({file: "/content_scripts/utils.js"})
 		browser.tabs.executeScript({file: "/content_scripts/picker_overlay.js"})
 		browser.tabs.executeScript({file: "/content_scripts/element_picker_factory.js"})
-		picker_open = true
-		
-		// browser.storage.local.get('token').then(function(data){
-			// picker.postMessage({greeting: 'Stored Login', data: data})
-		// });
-	}
-	else{
-		picker.postMessage({greeting: 'Close', close: true})
-		picker_open = false
-		// alert()
-	}
+		tabs[tab.id] = {url: tab.url}
+	}		
 };
 
 // Depreciated
-function HandleMessage(req, sender, sendResponse){
-	if(req.login_successful){
-		login_token = res.token
-		for(let tab of tabs){
-			browser.tabs.sendMessage(tab.id, {login_successful: true})
-		}
-	}
-}
-
-browser.runtime.onConnect.addListener(AcceptConnection);
-browser.runtime.onMessage.addListener(HandleMessage);
+// function HandleMessage(req, sender, sendResponse){
+	// if(req.login_successful){
+		// login_token = res.token
+		// for(let tab of tabs){
+			// browser.tabs.sendMessage(tab.id, {login_successful: true})
+		// }
+	// }
+// }
+bgid = Math.ceil(Math.random()*100)
 browser.browserAction.onClicked.addListener(LoadPickerOverlay);
+browser.runtime.onConnect.addListener(AcceptConnection);
+// browser.tabs.executeScript({file: "/content_scripts/logger.js"})'
