@@ -66,24 +66,28 @@ function PickerOverlayFactory(){
 
 	function OnMessage(msg){
 		console.log(msg.greeting);
-		if(msg.close){
-			picker_dom = document.getElementById('picker-overlay-main')
-			picker_dom.parentNode.removeChild(picker_dom)
+		if(msg.register){
+			port.postMessage({greeting: 'Register me', register: true})
 		}
 		
-		if(msg.login_successful){
-			ToggleLoggedIn(true, msg)
+		if(msg.close || msg.hide){
+			HidePicker();
+		}
+		
+		if(msg.show){
+			ShowPicker();
 		}
 	}
 	
 
 	function ConnectToBackgroundScript(){
-		port = browser.runtime.connect({name: 'picker'})
-		port.onMessage.addListener(OnMessage);	
+		var name = 'picker';
+		port = browser.runtime.connect({name: name})
+		port.onMessage.addListener(OnMessage);
 	}
 
 	function ShowLoginPrompt(){
-		port.postMessage({greeting: 'Show the login prompt', show_login_prompt: true});
+		login_prompt.Show();
 	}
 	
 	function LogOut(){
@@ -134,7 +138,7 @@ function PickerOverlayFactory(){
 		)
 	}
 	
-	function LoadHTML(){
+	function Load(){
 		var picker_interface_url = browser.runtime.getURL("html/element_picker.html");
 		var request = new XMLHttpRequest();
 		request.open('GET', picker_interface_url, true)
@@ -153,9 +157,14 @@ function PickerOverlayFactory(){
 		request.send();
 	}
 
-	function CloseInterface(){
-		var elem = document.querySelector('#plater-epicker');
-		elem.parentNode.removeChild(elem);
+	function ShowPicker(){
+		document.getElementById('picker-overlay-main').style.display = 'block'
+	}
+
+	function HidePicker(){
+		try{
+		document.getElementById('picker-overlay-main').style.display = 'none'
+		}catch(e){ console.log(e)}
 	}
 
 
@@ -259,11 +268,11 @@ function PickerOverlayFactory(){
 	}
 
 	function run(){
-		LoadHTML();
+		Load();
 	}
 	
 	picker.run = run;
-	picker.yes = true;
+	picker.ToggleLoggedIn = ToggleLoggedIn;
 	return picker
 }
 picker = PickerOverlayFactory()

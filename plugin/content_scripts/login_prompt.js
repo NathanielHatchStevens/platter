@@ -2,15 +2,15 @@ function LoginPromptFactory(){
 	var port
 	var username
 	
-	function ConnectToBackgroundScript(){
-		port = browser.runtime.connect({name: 'login'})
-		port.onMessage.addListener(OnMessage);	
-	}
-
 	function OnMessage(m){
 		console.log(m.greeting);
 	}		
-		
+	
+	function ConnectToBackgroundScript(){
+		// port = browser.runtime.connect({name: 'login'})
+		// port.onMessage.addListener(OnMessage);	
+	}
+
 	function GetSubmissionData(){
 		return {
 					'username': document.getElementById('platter-login-username-input').value, 
@@ -61,33 +61,24 @@ function LoginPromptFactory(){
 	}
 
 	function SubmitRegistration(){
-		console.log('registering...')
+		console.log('Registration not yet implemented')
 	}
 	
-	function CancelLogin(){
-		var login_prompt = document.getElementById('platter-login-body')
-		login_prompt.parentNode.removeChild(login_prompt);
+	function HideLogin(){
+		document.getElementById('platter-login-body').style.display = 'none';
 	}
 
-	function InitControls(){
-		console.log('Is the picker accesssable: '+picker.yes)
-		
+	function ShowLogin(){
+		document.getElementById('platter-login-body').style.display = 'block';
+	}
+
+	function InitControls(){		
 		document.getElementById('platter-webext-login').onclick = SubmitLogin;
-		// document.getElementById('platter-webext-register').onclick = SubmitRegistration;
-		document.getElementById('platter-webext-cancel').onclick = CancelLogin;
-		
-		browser.runtime.onMessage.addListener(
-			function(req, sender, senderResponse){
-				console.log('Message recieved'+req)
-				// console.log(req)
-				// if(req.login_successful){
-					// console.log('logindetected successful login')
-				// }
-			}
-		);
+		document.getElementById('platter-webext-register').onclick = SubmitRegistration;
+		document.getElementById('platter-webext-cancel').onclick = HideLogin;
 	}
 
-	function OpenLoginPrompt(){
+	function LoadLoginPromptHTML(){
 		var picker_interface_url = browser.runtime.getURL("html/login_prompt.html");
 		var request = new XMLHttpRequest();
 		request.open('GET', picker_interface_url, true)
@@ -101,6 +92,7 @@ function LoginPromptFactory(){
 
 				InitControls();
 				ConnectToBackgroundScript();
+				HideLogin();
 					
 			}
 		};
@@ -111,10 +103,12 @@ function LoginPromptFactory(){
 	}
 	
 	var login_prompt = {}
-	login_prompt.Open = OpenLoginPrompt;
+	login_prompt.Load = LoadLoginPromptHTML;
+	login_prompt.Hide = HideLogin;
+	login_prompt.Show = ShowLogin;
 	return login_prompt
 }
 
 login_prompt = LoginPromptFactory()
 
-login_prompt.Open()
+login_prompt.Load()

@@ -1,87 +1,41 @@
-var login_token
-
-
-var picker_open = false
-
-var picker = false
-var login = false
-var logger = false
-
 var tabs = {}
+var ports = {}
 
-var bgid = -1
-
-function log(msg){
-	picker.postMessage({greeting: '[BackgroundScript('+bgid+']: '+msg})
-}
-
-function error(e){
-	picker.postMessage({greeting: '[BackgroundScript ERROR]: '+e})
-}
-
-function OnMessage(msg, sender, sendResponse){
-	if(msg.relay){
-		target = msg.relay_target
-		delete msg.relay
-		delete msg.relay_target
-		
-		if(target == 'picker'){
-			picker.postMessage(msg)
-		}
-		else{
-			log('Unknown relay target: '+target)
-		}
-	}
-	if(msg.show_login_prompt){
-		browser.tabs.executeScript({file: "/content_scripts/login_prompt.js"});
-	}
-}
-
-function AcceptConnection(p){
-	let id = p.name
-	
-	if(id == 'picker'){
-		picker = p;
-	}
-	else if(id == 'login'){
-		login = p;
-	}
-	else if(id == 'logger'){
-		logger = p;
-	}
-	else{
-		log('Unknown connection origin: '+id)
-		return
-	}
-	p.onMessage.addListener(OnMessage);
-	log('Connection Accepted: '+id)
-}
-
+var latest_port = false
 
 function LoadPickerOverlay(tab){
-	if(tab.id in tabs){
-		log('Tab has overlay already')
-		picker.postMessage({greeting: 'close', close: true});
-		delete tabs[tab.id];
-	}
-	else{
+	if(tab.id in tabs == false){
 		browser.tabs.executeScript({file: "/content_scripts/utils.js"})
 		browser.tabs.executeScript({file: "/content_scripts/picker_overlay.js"})
 		browser.tabs.executeScript({file: "/content_scripts/element_picker_factory.js"})
-		tabs[tab.id] = {url: tab.url}
-	}		
-};
+		browser.tabs.executeScript({file: "/content_scripts/login_prompt.js"})
+		tabs[tab.id] = {visible: true};
+	}
+	else{
+		if(tabs[tab.id].visible){
+			ports[tab.id].postMessage({greeting: 'hide', hide: true});
+			tabs[tab.id].visible = false;
+		}
+		else{
+			ports[tab.id].postMessage({greeting: 'show', show: true});
+			tabs[tab.id].visible = true;
+		}
+	}
+}
 
-// Depreciated
-// function HandleMessage(req, sender, sendResponse){
-	// if(req.login_successful){
-		// login_token = res.token
-		// for(let tab of tabs){
-			// browser.tabs.sendMessage(tab.id, {login_successful: true})
-		// }
-	// }
-// }
-bgid = Math.ceil(Math.random()*100)
+function AcceptConnection(port){
+	port.onMessage.addListener(OnMessage);
+	latest_port = port;
+	port.postMessage({greeting: "What's your tab id", register: true});
+}
+
+function OnMessage(msg, sender, sendResponse){
+	tab_id = sender.sender.tab.id
+	if(msg.register){
+		ports[tab_id] = latest_port;
+		latest_port = false;
+	}
+}
+
 browser.browserAction.onClicked.addListener(LoadPickerOverlay);
 browser.runtime.onConnect.addListener(AcceptConnection);
-// browser.tabs.executeScript({file: "/content_scripts/logger.js"})'
