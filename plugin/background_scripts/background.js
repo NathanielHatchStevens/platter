@@ -4,23 +4,29 @@ var ports = {}
 var latest_port = false
 
 function LoadPickerOverlay(tab){
-	if(tab.id in tabs == false){
+	// if(tab.id in tabs == false || tab.id in ports == false){
 		browser.tabs.executeScript({file: "/content_scripts/utils.js"})
-		browser.tabs.executeScript({file: "/content_scripts/picker_overlay.js"})
+		
 		browser.tabs.executeScript({file: "/content_scripts/element_picker_factory.js"})
+			.then( ()=> browser.tabs.executeScript({file: "/content_scripts/picker_overlay.js"}))
+			
 		browser.tabs.executeScript({file: "/content_scripts/login_prompt.js"})
 		tabs[tab.id] = {visible: true};
-	}
-	else{
-		if(tabs[tab.id].visible){
-			ports[tab.id].postMessage({greeting: 'hide', hide: true});
-			tabs[tab.id].visible = false;
-		}
-		else{
-			ports[tab.id].postMessage({greeting: 'show', show: true});
-			tabs[tab.id].visible = true;
-		}
-	}
+	// }
+	// else{
+		// if(tabs[tab.id].visible){
+			// try{
+			// ports[tab.id].postMessage({greeting: 'hide', hide: true});
+			// }catch(e){}
+			// tabs[tab.id].visible = false;
+		// }
+		// else{
+			// try{
+			// ports[tab.id].postMessage({greeting: 'show', show: true});
+			// }catch(e){}
+			// tabs[tab.id].visible = true;
+		// }
+	// }
 }
 
 function AcceptConnection(port){

@@ -1,7 +1,5 @@
 function PickerOverlayFactory(){
-		
-	var picker = {}
-	
+	'use strict';
 	var picking = false;
 	var picking_id = '';
 	var picking_subheading = false;
@@ -11,13 +9,15 @@ function PickerOverlayFactory(){
 
 	var port;
 	var token = false;
+	
+	var visible = false;
 
 	function StartPicking(id){
-		if(picking == true){
+		if(picking === true){
 			return false;
 		}
 		
-		element_picker.init({onClick});
+		element_picker.init({'onClick': onClick}); //marked
 		picking_id = id;
 		
 		var pick_done_button = document.getElementById('start-picking-'.concat(id));
@@ -26,8 +26,8 @@ function PickerOverlayFactory(){
 		pick_done_button.onclick = (function (myvar){
 												return function(){
 													StopPicking(myvar);
-												}
-											})(id);	
+												};
+											}(id));	//moved invocation into bracked containing function prev: }})(id);
 		document.getElementById('pick-'+id+'-subheading').style.display = 'block';
 		picking = true;	
 		return false; // stops browser follow dud link
@@ -42,20 +42,26 @@ function PickerOverlayFactory(){
 		pick_done_button.onclick = (function (myvar){
 												return function(){
 													StartPicking(myvar);
-												}
-											})(id);
+												};
+											}(id));//moved invocation into bracked containing function prev: }})(id);
 			
 		document.getElementById('pick-'+id+'-subheading').style.display = 'none';
-		picking = false	
-		return false
+		picking = false;
+		return false;
+	}
+	
+	function ReturnFromLogin(success, login_info){
+		console.log('Success: '+success+' (value not used yet)');
+		ShowPicker();
+		ToggleLoggedIn(true, login_info);
 	}
 	
 	function ToggleLoggedIn(logged_in, login_info){
 		if(logged_in){
-			document.getElementById('platter-username').innerHTML = login_info.username
+			document.getElementById('platter-username').innerHTML = login_info.username;
 			document.getElementById('platter-login-element').style.display = 'none';
 			document.getElementById('platter-username-logout-element').style.display = 'block';
-			token = login_info.token
+			token = login_info.token;
 		}
 		else{
 			document.getElementById('platter-login-element').style.display = 'block';
@@ -65,9 +71,8 @@ function PickerOverlayFactory(){
 	}
 
 	function OnMessage(msg){
-		console.log(msg.greeting);
 		if(msg.register){
-			port.postMessage({greeting: 'Register me', register: true})
+			port.postMessage({greeting: 'Register me', register: true});
 		}
 		
 		if(msg.close || msg.hide){
@@ -82,43 +87,49 @@ function PickerOverlayFactory(){
 
 	function ConnectToBackgroundScript(){
 		var name = 'picker';
-		port = browser.runtime.connect({name: name})
+		port = browser.runtime.connect({name: name});
 		port.onMessage.addListener(OnMessage);
 	}
 
 	function ShowLoginPrompt(){
+		// alert('show login');
+		HidePicker();
 		login_prompt.Show();
 	}
 	
 	function LogOut(){
 		browser.storage.local.remove('login_info');
-		ToggleLoggedIn(false)
+		ToggleLoggedIn(false);
 	}
 
 	function InitControls(){
+		
 		document.getElementById('start-picking-title').onclick = (function (id){
 																						return function(){
 																							StartPicking(id);
-																						}
-																					})('title');
+																						};
+																					}('title'));
 		
 		document.getElementById('start-picking-ingredients').onclick = (function (id){
 																								return function(){
 																									StartPicking(id);
-																								}
-																							})('ingredients');
+																								};
+																							}('ingredients'));
 																							
 		document.getElementById('start-picking-method').onclick =  (function (id){
 																								return function(){
 																									StartPicking(id);
-																								}
-																							})('method');
+																								};
+																							}('method'));
 																							
-		document.getElementById('submit-recipe').onclick = SubmitRecipe;
+		document.getElementById('submit-recipe-local').onclick = SubmitRecipeLocal;
+		
+		document.getElementById('submit-recipe-remote').onclick = SubmitRecipeRemote;
 		document.getElementById('platter-show-login').onclick = ShowLoginPrompt;
 		document.getElementById('platter-submit-logout').onclick = LogOut;
 		
-				
+		
+		
 		for(let el of document.getElementsByClassName('pick-subheading')){
 			el.style.display = 'none';
 			el.onclick = function(){ picking_subheading = true; };
@@ -129,19 +140,19 @@ function PickerOverlayFactory(){
 		.then(
 			function(data){
 				if(data.login_info){
-					ToggleLoggedIn(true, data.login_info)
+					ToggleLoggedIn(true, data.login_info);
 				}
 				else{
-					ToggleLoggedIn(false)
+					ToggleLoggedIn(false);
 				}
 			}
-		)
+		);
 	}
 	
-	function Load(){
+	function Load(){		
 		var picker_interface_url = browser.runtime.getURL("html/element_picker.html");
 		var request = new XMLHttpRequest();
-		request.open('GET', picker_interface_url, true)
+		request.open('GET', picker_interface_url, true);
 
 		request.onload = function(){
 			if(request.status >=200 && request.status <400){
@@ -156,25 +167,53 @@ function PickerOverlayFactory(){
 
 		request.send();
 	}
-
+	
+	
+	function ToggleVisibility(){
+		if(visible){
+			HidePicker();
+		}
+		else{
+			ShowPicker();
+		}
+	}
+	
 	function ShowPicker(){
-		document.getElementById('picker-overlay-main').style.display = 'block'
+		var el = document.getElementById('picker-overlay-main');
+		if(el != null){
+			el.style.display = 'block';
+		}
+		visible = true;
 	}
 
 	function HidePicker(){
 		try{
-		document.getElementById('picker-overlay-main').style.display = 'none'
-		}catch(e){ console.log(e)}
+		document.getElementById('picker-overlay-main').style.display = 'none';
+		visible = false;
+		}catch(e){ console.log(e);}
 	}
 
-
-	function SubmitRecipe(){
-		post_url ='http://localhost:8000/submit_recipe'
-
+	
+	function SubmitRecipeLocal(){
+		post_url ='http://localhost:8000/submit_recipe';
+		SubmitRecipe(post_url);
+	}
+	
+	function SubmitRecipeRemote(){
+		var remote_url ='http://13.211.52.96:8000/submit_recipe';
+		try{
+			SubmitRecipe(remote_url);
+		}catch(e){console.log(e);}
+	}
+		
+	
+	function SubmitRecipe(url){
+		console.log('submit_recipe function');
+		var post_url = url;
 		var recipe = {};
-		recipe['token'] = token;
-		recipe['url'] = document.URL;
-		recipe['title'] = document.getElementById('recipe-title').innerText;
+		recipe.token = token;
+		recipe.url = document.URL;
+		recipe.title = document.getElementById('recipe-title').innerText;
 		
 		for(let id of ['ingredients', 'method']){
 			
@@ -182,8 +221,8 @@ function PickerOverlayFactory(){
 			
 			for(let li of Array.from(document.getElementById(id).children)){
 				var line = li.getAttribute('data-full-line');
-				var subheading = (li.getAttribute('data-heading') == '1')
-				recipe[id].push({'line':line, 'subheading': subheading})	
+				var subheading = (li.getAttribute('data-heading') == '1');
+				recipe[id].push({'line':line, 'subheading': subheading});
 			}
 		}
 		
@@ -201,7 +240,7 @@ function PickerOverlayFactory(){
 		var text = element.innerText;
 		if(picking_id == 'title'){
 			SetTitle(text);
-			StopPicking(picking_id)
+			StopPicking(picking_id);
 		}
 		else{
 			AddToList(text);
@@ -220,7 +259,7 @@ function PickerOverlayFactory(){
 									var parent = self.parentNode;
 									var grand_parent = parent.parentNode;
 									grand_parent.removeChild(parent);
-								}
+								};
 							})(btn);
 		
 		return btn;
@@ -228,7 +267,7 @@ function PickerOverlayFactory(){
 	}
 
 	function SetTitle(text){
-		var el = document.querySelector('span#recipe-title')
+		var el = document.querySelector('span#recipe-title');
 		el.textContent = text;
 	}
 
@@ -237,7 +276,7 @@ function PickerOverlayFactory(){
 			var list = document.querySelector('ul#'+picking_id);
 			var new_li = document.createElement('li');
 			var index = list.childNodes.length;
-			var display_text = 'ERROR'
+			var display_text = 'ERROR';
 			
 			new_li.setAttribute('data-full-line', line);
 			
@@ -251,7 +290,7 @@ function PickerOverlayFactory(){
 			if(picking_subheading){
 				bold = document.createElement('b');
 				bold.textContent = display_text;
-				new_li.appendChild(bold)	
+				new_li.appendChild(bold);
 				new_li.setAttribute('data-heading', '1');
 				picking_subheading = false;
 			}
@@ -269,12 +308,22 @@ function PickerOverlayFactory(){
 
 	function run(){
 		Load();
+		ShowPicker();
 	}
 	
+	var picker = {};
+	picker.ToggleVisibility = ToggleVisibility;
 	picker.run = run;
-	picker.ToggleLoggedIn = ToggleLoggedIn;
-	return picker
+	picker.ReturnFromLogin = ReturnFromLogin;	
+	
+	return picker;
 }
-picker = PickerOverlayFactory()
 
-picker.run()
+if(typeof picker == "object"){
+	picker.ToggleVisibility();
+}
+else{
+	picker = PickerOverlayFactory();
+	picker.run();
+}
+

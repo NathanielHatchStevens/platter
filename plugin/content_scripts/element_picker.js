@@ -31,8 +31,8 @@ function elementPickerFactory() {
 
     event      = event || window.event;
     var target = event.target || event.srcElement;
-    if (event.preventDefault) event.preventDefault();
-    if (event.stopPropagation) event.stopPropagation();
+    if (event.preventDefault){ event.preventDefault(); }
+    if (event.stopPropagation){ event.stopPropagation(); }
     onClick(target);
     reset();
     return false

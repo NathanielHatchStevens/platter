@@ -1,5 +1,6 @@
 
 function PostData(url = '', data = {}) {
+	console.log('posting data')
   // Default options are marked with *
     return fetch(url, {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
