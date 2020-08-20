@@ -82,6 +82,9 @@ function PickerOverlayFactory(){
 	}
 	
 	function OnMessage(msg){
+		console.log('message to picker')
+		console.log(msg)
+		
 		if(msg.register){
 			port.postMessage({greeting: 'Register me', register: true});
 		}
@@ -143,54 +146,46 @@ function PickerOverlayFactory(){
 		SetLoginStatus();
 	}
 	
-	function Load(){		
-		var picker_interface_url = browser.runtime.getURL("html/element_picker.html");
-		var request = new XMLHttpRequest();
-		request.open('GET', picker_interface_url, true);
-
-		request.onload = function(){
-			if(request.status >=200 && request.status <400){
-				var resp = request.responseText;			
-				var frag = document.createElement('html');
-				frag.innerHTML = resp;
-				document.querySelector('body').appendChild(frag);	
-				InitControls();
-				ConnectToBackgroundScript();
-			}
-		};
-
-		request.send();
-		
-		LoadSuccessPop();
-	}
-	
-	function LoadResource(location, onload){
+	function LoadResource(location, success){
 		var resource_url = browser.runtime.getURL(location);
 		var request = new XMLHttpRequest();
-		request.open('GET', resource_url, true);
-		request.onload = onload;
-		request.send()
-	}
 		
-	
-	function LoadSuccessPop(){
-		var url = browser.runtime.getURL("html/recipe_submission_success.html");
-		var request = new XMLHttpRequest();
-		request.open('get', url, true);
+		request.open('GET', resource_url, true);
 		request.onload = function(){
 			if(request.status >=200 && request.status<400){
-				var resp = request.responseText;			
-				var frag = document.createElement('html');
-				frag.innerHTML = resp;
-				document.querySelector('body').appendChild(frag);
-				document.getElementById('recipe-submission-success-pop').style.display = 'none';
-			}
+				if(success != undefined){
+					success(request.responseText);
+				}
+			};
 		};
-		
-		request.send();
+		request.send()
 	}
-				
 	
+	function Load(){
+		
+		// LoadResource('css/element_picker.css',
+					// function(text){
+						// console.log(text);
+					// });
+		LoadResource("html/element_picker.html", 
+					function(text){
+						var resp = text;
+						var frag = document.createElement('html');
+						frag.innerHTML = resp;
+						document.querySelector('body').appendChild(frag);	
+						InitControls();
+						ConnectToBackgroundScript();									
+					});
+					
+		LoadResource("html/recipe_submission_success.html",
+					function(text){
+						var resp = text;
+						var frag = document.createElement('html');
+						frag.innerHTML = resp;
+						document.querySelector('body').appendChild(frag);
+						document.getElementById('recipe-submission-success-pop').style.display = 'none';
+					});		
+	}
 	
 	function ToggleVisibility(){
 		if(visible){
