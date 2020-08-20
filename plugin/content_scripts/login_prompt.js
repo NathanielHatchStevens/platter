@@ -25,7 +25,6 @@ function LoginPromptFactory() {
 	}
 
 	function SubmitLogin(){
-		console.log('Submitting login');
 		var data = GetSubmissionData();
 		if(PrecheckSubmissionData(data) == false){
 			console.log('Precheck failed');
@@ -46,20 +45,14 @@ function LoginPromptFactory() {
 			if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
 				let submit_response = JSON.parse(xhr.responseText);
 				if(submit_response.success){
-					ReturnToPicker(true, {username: username});
-					// document.getElementById('platter-login-body').style.display = 'none';
-					// console.log(username);
+					// ReturnToPicker(true, {username: username, token: submit_response.token});
 					browser.storage.local.set({login_info: {username: username, token: submit_response.token}});
-					// var msg = {greeting: 'Login Successful', 
- 								  // relay: true,
-								  // relay_target: 'picker',
-								  // login_successful: true, 
-								  // username: username,
-								  // token: submit_response.token};
-					// port.postMessage(msg);
+					ReturnToPicker(true);
 				}
 				else{
 					console.log('failed');
+					alert('failed');
+					ReturnToPicker(false);
 				}
 					
 			}
@@ -71,9 +64,9 @@ function LoginPromptFactory() {
 		console.log('Registration not yet implemented');
 	}
 	
-	function ReturnToPicker(success, login_info){
+	function ReturnToPicker(success){
 		HideLogin();
-		picker.ReturnFromLogin(success, login_info);
+		picker.ReturnFromLogin(success);
 	}
 	
 	function HideLogin(){

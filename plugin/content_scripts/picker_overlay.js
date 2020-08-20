@@ -4,14 +4,15 @@ function PickerOverlayFactory(){
 	var picking_id = '';
 	var picking_subheading = false;
 	var max_line_display_length = 100;
-
+	var remote_url ='http://13.211.52.96:8000/submit_recipe';
+	
 	var element_picker = elementPickerFactory();
 
 	var port;
 	var token = false;
 	
 	var visible = false;
-
+	
 	function StartPicking(id){
 		if(picking === true){
 			return false;
@@ -50,26 +51,36 @@ function PickerOverlayFactory(){
 		return false;
 	}
 	
-	function ReturnFromLogin(success, login_info){
-		console.log('Success: '+success+' (value not used yet)');
-		ShowPicker();
-		ToggleLoggedIn(true, login_info);
+	function SetLoginStatus(){
+		browser.storage.local.get('login_info')
+		.then(
+			function(data){
+				if(data.login_info){
+					document.getElementById('platter-username').innerHTML = data.login_info.username;
+					document.getElementById('platter-login-element').style.display = 'none';
+					document.getElementById('platter-username-logout-element').style.display = 'block';
+					token = data.login_info.token;
+				}
+				
+				else{
+					document.getElementById('platter-login-element').style.display = 'block';
+					document.getElementById('platter-username-logout-element').style.display = 'none';
+					token = false;
+				}
+			}
+		);
 	}
 	
-	function ToggleLoggedIn(logged_in, login_info){
-		if(logged_in){
-			document.getElementById('platter-username').innerHTML = login_info.username;
-			document.getElementById('platter-login-element').style.display = 'none';
-			document.getElementById('platter-username-logout-element').style.display = 'block';
-			token = login_info.token;
-		}
-		else{
-			document.getElementById('platter-login-element').style.display = 'block';
-			document.getElementById('platter-username-logout-element').style.display = 'none';
-			token = false;
-		}
+	function ReturnFromLogin(success){
+		SetLoginStatus();
+		ShowPicker();
 	}
-
+	
+	function LogOut(){
+		browser.storage.local.remove('login_info');
+		SetLoginStatus();
+	}
+	
 	function OnMessage(msg){
 		if(msg.register){
 			port.postMessage({greeting: 'Register me', register: true});
@@ -84,7 +95,6 @@ function PickerOverlayFactory(){
 		}
 	}
 	
-
 	function ConnectToBackgroundScript(){
 		var name = 'picker';
 		port = browser.runtime.connect({name: name});
@@ -97,11 +107,6 @@ function PickerOverlayFactory(){
 		login_prompt.Show();
 	}
 	
-	function LogOut(){
-		browser.storage.local.remove('login_info');
-		ToggleLoggedIn(false);
-	}
-
 	function InitControls(){
 		
 		document.getElementById('start-picking-title').onclick = (function (id){
@@ -127,8 +132,7 @@ function PickerOverlayFactory(){
 		document.getElementById('submit-recipe-remote').onclick = SubmitRecipeRemote;
 		document.getElementById('platter-show-login').onclick = ShowLoginPrompt;
 		document.getElementById('platter-submit-logout').onclick = LogOut;
-		
-		
+		document.getElementById('test-link').onclick = SuccessfulSubmission;
 		
 		for(let el of document.getElementsByClassName('pick-subheading')){
 			el.style.display = 'none';
@@ -136,17 +140,7 @@ function PickerOverlayFactory(){
 			picking_subheading = false;
 		}
 		
-		browser.storage.local.get('login_info')
-		.then(
-			function(data){
-				if(data.login_info){
-					ToggleLoggedIn(true, data.login_info);
-				}
-				else{
-					ToggleLoggedIn(false);
-				}
-			}
-		);
+		SetLoginStatus();
 	}
 	
 	function Load(){		
@@ -166,7 +160,36 @@ function PickerOverlayFactory(){
 		};
 
 		request.send();
+		
+		LoadSuccessPop();
 	}
+	
+	function LoadResource(location, onload){
+		var resource_url = browser.runtime.getURL(location);
+		var request = new XMLHttpRequest();
+		request.open('GET', resource_url, true);
+		request.onload = onload;
+		request.send()
+	}
+		
+	
+	function LoadSuccessPop(){
+		var url = browser.runtime.getURL("html/recipe_submission_success.html");
+		var request = new XMLHttpRequest();
+		request.open('get', url, true);
+		request.onload = function(){
+			if(request.status >=200 && request.status<400){
+				var resp = request.responseText;			
+				var frag = document.createElement('html');
+				frag.innerHTML = resp;
+				document.querySelector('body').appendChild(frag);
+				document.getElementById('recipe-submission-success-pop').style.display = 'none';
+			}
+		};
+		
+		request.send();
+	}
+				
 	
 	
 	function ToggleVisibility(){
@@ -195,20 +218,20 @@ function PickerOverlayFactory(){
 
 	
 	function SubmitRecipeLocal(){
-		post_url ='http://localhost:8000/submit_recipe';
-		SubmitRecipe(post_url);
+		var local_url ='http://localhost:8000/submit_recipe';
+		SubmitRecipe(local_url);
 	}
 	
 	function SubmitRecipeRemote(){
-		var remote_url ='http://13.211.52.96:8000/submit_recipe';
-		try{
-			SubmitRecipe(remote_url);
-		}catch(e){console.log(e);}
+		SubmitRecipe(remote_url);
 	}
 		
 	
 	function SubmitRecipe(url){
-		console.log('submit_recipe function');
+		if(token === false){
+			alert('not logged in');
+			return;
+		}
 		var post_url = url;
 		var recipe = {};
 		recipe.token = token;
@@ -227,8 +250,22 @@ function PickerOverlayFactory(){
 		}
 		
 		PostData(post_url, recipe)
-		.then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
+		.then(response => response.json())
+		// .then(data => console.log(data))
+		// .then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
 		.catch(error => console.error(error));
+	}
+
+	function SuccessfulSubmission(){
+		document.getElementById('picker-overlay-main').style.display = 'none';
+		document.getElementById('recipe-submission-success-pop').style.display = 'block';
+		document.getElementById('submission-success-link').href = 'http://13.211.52.96:8000/';
+		
+		window.setTimeout(function(){
+				document.getElementById('recipe-submission-success-pop').style.display = 'none';
+			},
+			5000);
+
 	}
 
 	function onClick(element){
