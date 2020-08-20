@@ -20,19 +20,11 @@ function LoginPromptFactory() {
 		}
 		username = data.username;
 		
-		var xhr = new XMLHttpRequest();
-		data = JSON.stringify(data);
-		
-		xhr.open("POST", 'http://13.211.52.96:8000/plugin_login')
-		// xhr.open("POST", 'http://localhost:8000/plugin_login');
-		xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-		xhr.onreadystatechange = function () {
-			console.log('request status: '+xhr.status);
-			console.log('request status: '+xhr.statusText);
-			if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-				let submit_response = JSON.parse(xhr.responseText);
+		PostData('http://localhost:8000/plugin_login', data)
+		.then(response => response.json().then(
+			function(submit_response){
+				console.log(submit_response);
 				if(submit_response.success){
-					// ReturnToPicker(true, {username: username, token: submit_response.token});
 					browser.storage.local.set({login_info: {username: username, token: submit_response.token}});
 					ReturnToPicker(true);
 				}
@@ -41,10 +33,7 @@ function LoginPromptFactory() {
 					alert('failed');
 					ReturnToPicker(false);
 				}
-					
-			}
-		};
-		xhr.send(data);
+			}));
 	}
 
 	function SubmitRegistration(){
