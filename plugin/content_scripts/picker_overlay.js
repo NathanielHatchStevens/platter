@@ -114,7 +114,7 @@ function PickerOverlayFactory(){
 		document.getElementById('submit-recipe-remote').onclick = SubmitRecipeRemote;
 		document.getElementById('platter-show-login').onclick = ShowLoginPrompt;
 		document.getElementById('platter-submit-logout').onclick = LogOut;
-		document.getElementById('test-link').onclick = SuccessfulSubmission;
+		document.getElementById('test-link').onclick = TestFunc;
 		
 		for(let el of document.getElementsByClassName('pick-subheading')){
 			el.style.display = 'none';
@@ -123,6 +123,11 @@ function PickerOverlayFactory(){
 		}
 		
 		SetLoginStatus();
+	}
+	
+	function TestFunc(){
+		// fetch('http://localhost:8000/server_test', {method: 'POST'})
+		// .then(result =>	result.json().then(data => console.log(data.server_test)));
 	}
 	
 	function LoadResource(location, success){
@@ -141,11 +146,6 @@ function PickerOverlayFactory(){
 	}
 	
 	function Load(){
-		
-		// LoadResource('css/element_picker.css',
-					// function(text){
-						// console.log(text);
-					// });
 		LoadResource("html/element_picker.html", 
 					function(text){
 						var resp = text;
@@ -197,8 +197,7 @@ function PickerOverlayFactory(){
 	
 	function SubmitRecipeRemote(){
 		SubmitRecipe(remote_url);
-	}
-		
+	}		
 	
 	function SubmitRecipe(url){
 		if(token === false){
@@ -222,10 +221,8 @@ function PickerOverlayFactory(){
 		}
 		
 		PostData(post_url, recipe)
-		.then(response => response.json())
-		// .then(data => console.log(data))
-		// .then(data => console.log(JSON.stringify(data))) // JSON-string from `response.json()` call
-		.catch(error => console.error(error));
+		.then(response => response.json()
+			.then(data => console.log(data)));
 	}
 
 	function SuccessfulSubmission(){
