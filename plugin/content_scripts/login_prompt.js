@@ -1,18 +1,6 @@
 function LoginPromptFactory() {
-	var port = 0;
 	var username = 0;
 	
-	function OnMessage(m){
-		if(m.register){
-			port.postMessage({register: true})
-		}
-	}		
-	
-	function ConnectToBackgroundScript(){
-		port = browser.runtime.connect({name: 'login'});
-		port.onMessage.addListener(OnMessage);	
-	}
-
 	function GetSubmissionData(){
 		return {
 					'username': document.getElementById('platter-login-username-input').value, 
@@ -36,7 +24,6 @@ function LoginPromptFactory() {
 		data = JSON.stringify(data);
 		
 		xhr.open("POST", 'http://13.211.52.96:8000/plugin_login')
-		// xhr.open("POST", 'ec2-13-211-52-96.ap-southeast-2.compute.amazonaws.com:8000/plugin_login')
 		// xhr.open("POST", 'http://localhost:8000/plugin_login');
 		xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 		xhr.onreadystatechange = function () {
@@ -104,10 +91,7 @@ function LoginPromptFactory() {
 					
 			}
 		};
-
 		request.send();
-		
-		
 	}
 	
 	var login_prompt = {};

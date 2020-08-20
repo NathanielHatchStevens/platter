@@ -4,6 +4,8 @@ function PickerOverlayFactory(){
 	var picking_id = '';
 	var picking_subheading = false;
 	var max_line_display_length = 100;
+	
+	var local_url ='http://localhost:8000/submit_recipe';
 	var remote_url ='http://13.211.52.96:8000/submit_recipe';
 	
 	var element_picker = elementPickerFactory();
@@ -79,29 +81,6 @@ function PickerOverlayFactory(){
 	function LogOut(){
 		browser.storage.local.remove('login_info');
 		SetLoginStatus();
-	}
-	
-	function OnMessage(msg){
-		console.log('message to picker')
-		console.log(msg)
-		
-		if(msg.register){
-			port.postMessage({greeting: 'Register me', register: true});
-		}
-		
-		if(msg.close || msg.hide){
-			HidePicker();
-		}
-		
-		if(msg.show){
-			ShowPicker();
-		}
-	}
-	
-	function ConnectToBackgroundScript(){
-		var name = 'picker';
-		port = browser.runtime.connect({name: name});
-		port.onMessage.addListener(OnMessage);
 	}
 
 	function ShowLoginPrompt(){
@@ -213,7 +192,6 @@ function PickerOverlayFactory(){
 
 	
 	function SubmitRecipeLocal(){
-		var local_url ='http://localhost:8000/submit_recipe';
 		SubmitRecipe(local_url);
 	}
 	
@@ -233,8 +211,7 @@ function PickerOverlayFactory(){
 		recipe.url = document.URL;
 		recipe.title = document.getElementById('recipe-title').innerText;
 		
-		for(let id of ['ingredients', 'method']){
-			
+		for(let id of ['ingredients', 'method']){			
 			recipe[id] = [];		
 			
 			for(let li of Array.from(document.getElementById(id).children)){
